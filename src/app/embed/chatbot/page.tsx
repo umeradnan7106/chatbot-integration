@@ -6,7 +6,7 @@ import Chatbot from '@/components/Chatbot';
 
 export default function ChatbotPage() {
   return (
-    <div className="h-screen w-full bg-white">
+    <div>
       <Suspense fallback={<div className="text-center pt-20">Loading...</div>}>
         <Chatbot />
       </Suspense>

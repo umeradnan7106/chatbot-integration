@@ -23,7 +23,7 @@
   button.style.width = "50px";
   button.style.height = "50px";
   button.style.borderRadius = "50%";
-  button.style.background = "#2563EB";
+  // button.style.background = "#2563EB";
   button.style.color = "#fff";
   button.style.display = "flex";
   button.style.justifyContent = "center";
