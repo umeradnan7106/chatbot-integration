@@ -198,7 +198,7 @@ export default function Chatbot() {
     { from: "bot", text: "Hi, how can I help you today?" },
   ]);
   const [input, setInput] = useState("");
-  const [url] = useState("https://www.tidio.com/blog/chatbot-api/");
+  const [url] = useState("https://services-website-orpin.vercel.app/");
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);

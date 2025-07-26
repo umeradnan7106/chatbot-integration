@@ -1,15 +1,13 @@
-// app/embed/chatbot/page.tsx
 'use client';
 
 import { Suspense } from 'react';
-import Chatbot from '@/components/Chatbot';
+import ChatbotClientWrapper from './ChatbotClientWrapper';
 
-export default function ChatbotPage() {
+export default function EmbedChatbotPage() {
   return (
-    <div>
-      <Suspense fallback={<div className="text-center pt-20">Loading...</div>}>
-        <Chatbot />
-      </Suspense>
-    </div>
+    <Suspense fallback={<div>Loading chatbot...</div>}>
+      <ChatbotClientWrapper />
+    </Suspense>
   );
 }
+
