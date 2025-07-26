@@ -15,9 +15,6 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   const { id, message } = await req.json();
-
-  // For now, return a mocked AI response
   const reply = `You asked: "${message}". This is a mocked response from chatbot ${id}.`;
-
   return NextResponse.json({ reply });
 }

@@ -1,69 +1,135 @@
-'use client';
+"use client";
 
-import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+
+type Message = {
+  from: "user" | "bot";
+  text: string;
+};
+
+const suggestedQuestions = [
+  "Can you tell me more about this website?",
+  "What services or features do you provide?",
+  "How can I get in touch with you?",
+  "Do you offer support or help for visitors?",
+];
 
 export default function ChatbotClientWrapper() {
   const params = useSearchParams();
-  const chatbotId = params.get('id');
+  const chatbotId = params.get("id");
 
-  const [messages, setMessages] = useState([
-    { from: 'bot', text: 'Hi! How can I help you today?' },
+  const [messages, setMessages] = useState<Message[]>([
+    { from: "bot", text: "Hi! How can I help you today?" },
   ]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const sendMessage = async () => {
-    const newMessages = [...messages, { from: 'user', text: input }];
-    setMessages(newMessages);
-    setInput('');
+  const sendMessage = async (textToSend?: string) => {
+    const message = textToSend ?? input;
+    if (!message.trim()) return;
 
-    const res = await fetch('/api/ask-question', {
-      method: 'POST',
-      body: JSON.stringify({
-        chatbotId,
-        question: input,
-      }),
-    });
-    const data = await res.json();
+    const userMessage: Message = { from: "user", text: message };
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
+    setIsLoading(true);
 
-    setMessages([...newMessages, { from: 'bot', text: data.answer }]);
+    try {
+      const res = await fetch("/api/ask-question", {
+        method: "POST",
+        body: JSON.stringify({
+          chatbotId,
+          question: message,
+        }),
+      });
+      const data = await res.json();
+
+      const botMessage: Message = { from: "bot", text: data.answer };
+      setMessages((prev) => [...prev, botMessage]);
+    } catch (err) {
+      setMessages((prev) => [
+        ...prev,
+        { from: "bot", text: "⚠️ Sorry, something went wrong." },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") sendMessage();
+  };
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
   return (
-    <div style={{ fontFamily: 'sans-serif', height: '100%', padding: '10px' }}>
-      <div style={{ maxHeight: '430px', overflowY: 'auto' }}>
+    <div className="w-full h-screen flex flex-col bg-white rounded-xl border shadow-md text-sm">
+      {/* Header */}
+      <div className="bg-black text-white px-4 py-3 font-semibold flex justify-between items-center">
+        <span>ChatBot Assistant</span>
+      </div>
+
+      {/* Chat area */}
+      <div className="flex-1 overflow-y-auto p-3 bg-gray-100 space-y-2">
+        {/* Suggested Questions */}
+        <div className="mb-2 flex flex-wrap gap-2">
+          {suggestedQuestions.map((question, index) => (
+            <button
+              key={index}
+              className="text-xs bg-gray-200 px-3 py-1 rounded-full hover:bg-gray-300 transition"
+              onClick={() => sendMessage(question)}
+            >
+              {question}
+            </button>
+          ))}
+        </div>
+
+        {/* Messages */}
         {messages.map((msg, i) => (
-          <div key={i} style={{ textAlign: msg.from === 'bot' ? 'left' : 'right', margin: '10px 0' }}>
-            <span
-              style={{
-                display: 'inline-block',
-                padding: '8px 12px',
-                borderRadius: '20px',
-                background: msg.from === 'bot' ? '#e2e8f0' : '#1e40af',
-                color: msg.from === 'bot' ? '#000' : '#fff',
-              }}
+          <div
+            key={i}
+            className={`flex ${msg.from === "user" ? "justify-end" : "justify-start"}`}
+          >
+            <div
+              className={`rounded-lg px-4 py-2 max-w-[75%] whitespace-pre-line ${
+                msg.from === "user"
+                  ? "bg-black text-white"
+                  : "bg-white text-black border"
+              }`}
             >
               {msg.text}
-            </span>
+            </div>
           </div>
         ))}
+
+        {isLoading && (
+          <div className="flex justify-start">
+            <div className="bg-white text-black border px-4 py-2 rounded-lg text-sm">
+              Typing...
+            </div>
+          </div>
+        )}
+
+        <div ref={messagesEndRef} />
       </div>
-      <div style={{ display: 'flex', marginTop: '10px' }}>
+
+      {/* Input */}
+      <div className="border-t p-3 flex items-center gap-2">
         <input
+          type="text"
+          placeholder="Type your message..."
+          className="flex-1 p-2 text-sm border rounded-md"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          style={{ flex: 1, padding: '8px', borderRadius: '20px', border: '1px solid #ccc' }}
+          onKeyDown={handleKeyDown}
         />
         <button
-          onClick={sendMessage}
-          style={{
-            marginLeft: '10px',
-            padding: '8px 16px',
-            borderRadius: '20px',
-            background: '#1e40af',
-            color: '#fff',
-            border: 'none',
-          }}
+          onClick={() => sendMessage()}
+          disabled={isLoading}
+          className="bg-black text-white px-3 py-2 rounded-md disabled:opacity-50"
         >
           Send
         </button>
