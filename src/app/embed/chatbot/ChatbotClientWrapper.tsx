@@ -138,7 +138,6 @@
 //   );
 // }
 
-
 // components/ChatbotClientWrapper.tsx
 "use client";
 
@@ -197,7 +196,7 @@ export default function ChatbotClientWrapper() {
       };
 
       setMessages((prev) => [...prev, botMessage]);
-    } catch (err) {
+    } catch {
       setMessages((prev) => [
         ...prev,
         {
@@ -222,7 +221,8 @@ export default function ChatbotClientWrapper() {
     return (
       <div className="w-full h-screen flex items-center justify-center text-center p-8">
         <p className="text-red-600 text-sm">
-          ❌ Missing Chatbot ID. Please provide a valid chatbot ID in the URL as:
+          ❌ Missing Chatbot ID. Please provide a valid chatbot ID in the URL
+          as:
           <br />
           <code className="bg-gray-100 p-1 mt-2 block text-black">
             ?id=yourChatbotId

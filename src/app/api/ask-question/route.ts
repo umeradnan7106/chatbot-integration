@@ -1,20 +1,21 @@
-// import { NextResponse } from 'next/server';
-
-// export async function POST(req: Request) {
-//   const body = await req.json();
-//   const { chatbotId, question } = body;
-
-//   // For now, just mock a simple reply
-//   return NextResponse.json({
-//     answer: `You asked: "${question}" — this is a reply from bot ID ${chatbotId}`,
-//   });
-// }
-
-
 import { NextResponse } from "next/server";
+import { OpenAI } from "openai"; // install openai package
+
+if (!process.env.OPENAI_API_KEY) {
+  throw new Error("Missing OpenAI API Key");
+}
+
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
 
 export async function POST(req: Request) {
-  const { id, message } = await req.json();
-  const reply = `You asked: "${message}". This is a mocked response from chatbot ${id}.`;
+  const { message } = await req.json();
+
+  const completion = await openai.chat.completions.create({
+    messages: [{ role: "user", content: message }],
+    model: "google/gemini-2.0-flash-exp:free",
+  });
+
+  const reply = completion.choices[0].message.content;
   return NextResponse.json({ reply });
 }
