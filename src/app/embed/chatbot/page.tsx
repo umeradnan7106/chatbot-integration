@@ -1,7 +1,8 @@
+// src/app/embed/chatbot/page.tsx
 'use client';
 
 import { Suspense } from 'react';
-import ChatbotClientWrapper from './ChatbotClientWrapper';
+import ChatbotClientWrapper from '../../../components/ChatbotClientWrapper';
 
 export default function EmbedChatbotPage() {
   return (

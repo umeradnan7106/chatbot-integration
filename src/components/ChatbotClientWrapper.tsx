@@ -1,4 +1,4 @@
-// src/app/embed/chatbot/ChatbotClientWrapper.tsx
+// components/ChatbotClientWrapper.tsx
 "use client";
 
 import { useSearchParams } from "next/navigation";

@@ -1,3 +1,4 @@
+// src/components/GenerateForm.tsx
 "use client";
 
 import { useState } from "react";
